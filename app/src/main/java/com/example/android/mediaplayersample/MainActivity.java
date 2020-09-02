@@ -17,7 +17,7 @@
 package com.example.android.mediaplayersample;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -54,7 +54,7 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mPlayerAdapter.loadMedia(MEDIA_RES_ID);
+        mPlayerAdapter.loadMedia("http://34.66.8.61:8000/media/uploads/sounds/The_Christmas_Song_Sentimental.mp3");
         Log.d(TAG, "onStart: create MediaPlayer");
     }
 
@@ -144,7 +144,9 @@ public final class MainActivity extends AppCompatActivity {
         @Override
         public void onPositionChanged(int position) {
             if (!mUserIsSeeking) {
-                mSeekbarAudio.setProgress(position, true);
+                mSeekbarAudio.setProgress(position);
+
+//                mSeekbarAudio.setProgress(position, true);
                 Log.d(TAG, String.format("setPlaybackPosition: setProgress(%d)", position));
             }
         }

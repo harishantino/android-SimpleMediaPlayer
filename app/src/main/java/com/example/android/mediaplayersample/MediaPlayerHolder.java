@@ -18,8 +18,10 @@ package com.example.android.mediaplayersample;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +36,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
 
     private final Context mContext;
     private MediaPlayer mMediaPlayer;
-    private int mResourceId;
+    private String mResourceId;
     private PlaybackInfoListener mPlaybackInfoListener;
     private ScheduledExecutorService mExecutor;
     private Runnable mSeekbarPositionUpdateTask;
@@ -50,9 +52,19 @@ public final class MediaPlayerHolder implements PlayerAdapter {
      * object has to be created. That's why this method is private, and called by load(int) and
      * not the constructor.
      */
-    private void initializeMediaPlayer() {
+    private void initializeMediaPlayer(String link) {
         if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+            try {
+                mMediaPlayer.setDataSource(link);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
@@ -74,19 +86,20 @@ public final class MediaPlayerHolder implements PlayerAdapter {
 
     // Implements PlaybackControl.
     @Override
-    public void loadMedia(int resourceId) {
+    public void loadMedia(String resourceId) {
         mResourceId = resourceId;
 
-        initializeMediaPlayer();
+        initializeMediaPlayer(resourceId);
 
-        AssetFileDescriptor assetFileDescriptor =
-                mContext.getResources().openRawResourceFd(mResourceId);
-        try {
-            logToUI("load() {1. setDataSource}");
-            mMediaPlayer.setDataSource(assetFileDescriptor);
-        } catch (Exception e) {
-            logToUI(e.toString());
-        }
+//        AssetFileDescriptor assetFileDescriptor =
+//                mContext.getResources().openRawResourceFd(mResourceId);
+//        try {
+//            logToUI("load() {1. setDataSource}");
+//
+//            mMediaPlayer.setDataSource(resourceId);
+//        } catch (Exception e) {
+//            logToUI(e.toString());
+//        }
 
         try {
             logToUI("load() {2. prepare}");
@@ -119,8 +132,7 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     @Override
     public void play() {
         if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
-            logToUI(String.format("playbackStart() %s",
-                                  mContext.getResources().getResourceEntryName(mResourceId)));
+//            logToUI(String.format("playbackStart() %s", mContext.getResources().getResourceEntryName(mResourceId)));
             mMediaPlayer.start();
             if (mPlaybackInfoListener != null) {
                 mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.PLAYING);

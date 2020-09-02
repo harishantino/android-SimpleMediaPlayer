@@ -21,7 +21,7 @@ package com.example.android.mediaplayersample;
  */
 public interface PlayerAdapter {
 
-    void loadMedia(int resourceId);
+    void loadMedia(String resourceId);
 
     void release();
 
