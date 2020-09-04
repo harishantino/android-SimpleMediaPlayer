@@ -69,14 +69,12 @@ public final class MediaPlayerHolder implements PlayerAdapter {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
                     stopUpdatingCallbackWithPosition(true);
-                    logToUI("MediaPlayer playback completed");
                     if (mPlaybackInfoListener != null) {
                         mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.COMPLETED);
                         mPlaybackInfoListener.onPlaybackCompleted();
                     }
                 }
             });
-            logToUI("mMediaPlayer = new MediaPlayer()");
         }
     }
 
@@ -91,31 +89,17 @@ public final class MediaPlayerHolder implements PlayerAdapter {
 
         initializeMediaPlayer(resourceId);
 
-//        AssetFileDescriptor assetFileDescriptor =
-//                mContext.getResources().openRawResourceFd(mResourceId);
-//        try {
-//            logToUI("load() {1. setDataSource}");
-//
-//            mMediaPlayer.setDataSource(resourceId);
-//        } catch (Exception e) {
-//            logToUI(e.toString());
-//        }
-
         try {
-            logToUI("load() {2. prepare}");
             mMediaPlayer.prepare();
         } catch (Exception e) {
-            logToUI(e.toString());
         }
 
         initializeProgressCallback();
-        logToUI("initializeProgressCallback()");
     }
 
     @Override
     public void release() {
         if (mMediaPlayer != null) {
-            logToUI("release() and mMediaPlayer = null");
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
@@ -144,7 +128,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
     @Override
     public void reset() {
         if (mMediaPlayer != null) {
-            logToUI("playbackReset()");
             mMediaPlayer.reset();
             loadMedia(mResourceId);
             if (mPlaybackInfoListener != null) {
@@ -161,14 +144,12 @@ public final class MediaPlayerHolder implements PlayerAdapter {
             if (mPlaybackInfoListener != null) {
                 mPlaybackInfoListener.onStateChanged(PlaybackInfoListener.State.PAUSED);
             }
-            logToUI("playbackPause()");
         }
     }
 
     @Override
     public void seekTo(int position) {
         if (mMediaPlayer != null) {
-            logToUI(String.format("seekTo() %d ms", position));
             mMediaPlayer.seekTo(position);
         }
     }
@@ -223,15 +204,6 @@ public final class MediaPlayerHolder implements PlayerAdapter {
         if (mPlaybackInfoListener != null) {
             mPlaybackInfoListener.onDurationChanged(duration);
             mPlaybackInfoListener.onPositionChanged(0);
-            logToUI(String.format("firing setPlaybackDuration(%d sec)",
-                                  TimeUnit.MILLISECONDS.toSeconds(duration)));
-            logToUI("firing setPlaybackPosition(0)");
-        }
-    }
-
-    private void logToUI(String message) {
-        if (mPlaybackInfoListener != null) {
-            mPlaybackInfoListener.onLogUpdated(message);
         }
     }
 

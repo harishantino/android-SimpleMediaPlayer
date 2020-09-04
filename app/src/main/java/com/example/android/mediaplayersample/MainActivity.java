@@ -18,6 +18,11 @@ package com.example.android.mediaplayersample;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,20 +30,23 @@ import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Allows playback of a single MP3 file via the UI. It contains a {@link MediaPlayerHolder}
  * which implements the {@link PlayerAdapter} interface that the activity uses to control
  * audio playback.
  */
 public final class MainActivity extends AppCompatActivity {
+    private List<Movie> movieList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private Adapter mAdapter;
 
     public static final String TAG = "MainActivity";
-    public static final int MEDIA_RES_ID = R.raw.jazz_in_paris;
-
-    private TextView mTextDebug;
     private SeekBar mSeekbarAudio;
     private ScrollView mScrollContainer;
-    private PlayerAdapter mPlayerAdapter;
+//    private PlayerAdapter mPlayerAdapter;
     private boolean mUserIsSeeking = false;
 
     @Override
@@ -46,135 +54,139 @@ public final class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initializeUI();
-        initializeSeekbar();
-        initializePlaybackController();
-        Log.d(TAG, "onCreate: finished");
+//        initializeSeekbar();
+//        initializePlaybackController();
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mAdapter = new Adapter(movieList);
+        recyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+
+        prepareMovieData();
+
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mPlayerAdapter.loadMedia("http://34.66.8.61:8000/media/uploads/sounds/The_Christmas_Song_Sentimental.mp3");
-        Log.d(TAG, "onStart: create MediaPlayer");
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//    }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (isChangingConfigurations() && mPlayerAdapter.isPlaying()) {
-            Log.d(TAG, "onStop: don't release MediaPlayer as screen is rotating & playing");
-        } else {
-            mPlayerAdapter.release();
-            Log.d(TAG, "onStop: release MediaPlayer");
-        }
+//        if (isChangingConfigurations() && mPlayerAdapter.isPlaying()) {
+//            Log.d(TAG, "onStop: don't release MediaPlayer as screen is rotating & playing");
+//        } else {
+//            mPlayerAdapter.release();
+//        }
     }
 
     private void initializeUI() {
-        mTextDebug = (TextView) findViewById(R.id.text_debug);
         Button mPlayButton = (Button) findViewById(R.id.button_play);
         Button mPauseButton = (Button) findViewById(R.id.button_pause);
         Button mResetButton = (Button) findViewById(R.id.button_reset);
         mSeekbarAudio = (SeekBar) findViewById(R.id.seekbar_audio);
         mScrollContainer = (ScrollView) findViewById(R.id.scroll_container);
-
-        mPauseButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mPlayerAdapter.pause();
-                    }
-                });
-        mPlayButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mPlayerAdapter.play();
-                    }
-                });
-        mResetButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mPlayerAdapter.reset();
-                    }
-                });
+//
+//        mPauseButton.setOnClickListener(
+//                new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        mPlayerAdapter.pause();
+//                    }
+//                });
+//        mPlayButton.setOnClickListener(
+//                new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        mPlayerAdapter.play();
+//                    }
+//                });
+//        mResetButton.setOnClickListener(
+//                new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        mPlayerAdapter.reset();
+//                    }
+//                });
     }
+//
+//    private void initializePlaybackController() {
+//        MediaPlayerHolder mMediaPlayerHolder = new MediaPlayerHolder(this);
+//        mMediaPlayerHolder.setPlaybackInfoListener(new PlaybackListener());
+//        mPlayerAdapter = mMediaPlayerHolder;
+//    }
 
-    private void initializePlaybackController() {
-        MediaPlayerHolder mMediaPlayerHolder = new MediaPlayerHolder(this);
-        Log.d(TAG, "initializePlaybackController: created MediaPlayerHolder");
-        mMediaPlayerHolder.setPlaybackInfoListener(new PlaybackListener());
-        mPlayerAdapter = mMediaPlayerHolder;
-        Log.d(TAG, "initializePlaybackController: MediaPlayerHolder progress callback set");
-    }
+//    private void initializeSeekbar() {
+//        mSeekbarAudio.setOnSeekBarChangeListener(
+//                new SeekBar.OnSeekBarChangeListener() {
+//                    int userSelectedPosition = 0;
+//
+//                    @Override
+//                    public void onStartTrackingTouch(SeekBar seekBar) {
+//                        mUserIsSeeking = true;
+//                    }
+//
+//                    @Override
+//                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//                        if (fromUser) {
+//                            userSelectedPosition = progress;
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onStopTrackingTouch(SeekBar seekBar) {
+//                        mUserIsSeeking = false;
+//                        mPlayerAdapter.seekTo(userSelectedPosition);
+//                    }
+//                });
+//    }
 
-    private void initializeSeekbar() {
-        mSeekbarAudio.setOnSeekBarChangeListener(
-                new SeekBar.OnSeekBarChangeListener() {
-                    int userSelectedPosition = 0;
+//    public class PlaybackListener extends PlaybackInfoListener {
+//
+//        @Override
+//        public void onDurationChanged(int duration) {
+//            mSeekbarAudio.setMax(duration);
+//        }
+//
+//        @Override
+//        public void onPositionChanged(int position) {
+//            if (!mUserIsSeeking) {
+//                mSeekbarAudio.setProgress(position);
+//
+//            }
+//        }
+//
+//        @Override
+//        public void onStateChanged(@State int state) {
+//        }
+//
+//        @Override
+//        public void onPlaybackCompleted() {
+//        }
+//    }
 
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                        mUserIsSeeking = true;
-                    }
+    private void prepareMovieData() {
+        Movie movie = new Movie("http://34.66.8.61:8000/media/uploads/sounds/The_Christmas_Song_Sentimental.mp3");
+        movieList.add(movie);
 
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        if (fromUser) {
-                            userSelectedPosition = progress;
-                        }
-                    }
+        movie = new Movie("http://34.66.8.61:8000/media/uploads/sounds/The_Christmas_Song_Sentimental.mp3");
+        movieList.add(movie);
 
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        mUserIsSeeking = false;
-                        mPlayerAdapter.seekTo(userSelectedPosition);
-                    }
-                });
-    }
+        movie = new Movie("http://34.66.8.61:8000/media/uploads/sounds/The_Christmas_Song_Sentimental.mp3");
+        movieList.add(movie);
 
-    public class PlaybackListener extends PlaybackInfoListener {
+        movie = new Movie("http://34.66.8.61:8000/media/uploads/sounds/The_Christmas_Song_Sentimental.mp3");
+        movieList.add(movie);
 
-        @Override
-        public void onDurationChanged(int duration) {
-            mSeekbarAudio.setMax(duration);
-            Log.d(TAG, String.format("setPlaybackDuration: setMax(%d)", duration));
-        }
-
-        @Override
-        public void onPositionChanged(int position) {
-            if (!mUserIsSeeking) {
-                mSeekbarAudio.setProgress(position);
-
-//                mSeekbarAudio.setProgress(position, true);
-                Log.d(TAG, String.format("setPlaybackPosition: setProgress(%d)", position));
-            }
-        }
-
-        @Override
-        public void onStateChanged(@State int state) {
-            String stateToString = PlaybackInfoListener.convertStateToString(state);
-            onLogUpdated(String.format("onStateChanged(%s)", stateToString));
-        }
-
-        @Override
-        public void onPlaybackCompleted() {
-        }
-
-        @Override
-        public void onLogUpdated(String message) {
-            if (mTextDebug != null) {
-                mTextDebug.append(message);
-                mTextDebug.append("\n");
-                // Moves the scrollContainer focus to the end.
-                mScrollContainer.post(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                mScrollContainer.fullScroll(ScrollView.FOCUS_DOWN);
-                            }
-                        });
-            }
-        }
+        movie = new Movie("http://34.66.8.61:8000/media/uploads/sounds/The_Christmas_Song_Sentimental.mp3");
+        movieList.add(movie);
+        // notify adapter about data set changes
+        // so that it will render the list with new data
+        mAdapter.notifyDataSetChanged();
     }
 }
